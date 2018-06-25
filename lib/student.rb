@@ -26,17 +26,27 @@ attr_reader :id
   end
   
   def self.create_table
-  end 
-  
+    sql = <<-SQL
+    CREATE TABLE IF NOT EXISTS students(
+        id INTEGER PRIMARY KEY,
+        name TEXT,
+        grade TEXT
+      )
+    SQL
+
+    DB[:conn].execute(sql)
+    end
+    
   def self.drop_table
+    sql = "DROP TABLE IF EXISTS students"
+
+    DB[:conn].execute(sql)
   end
 
-
- 
   def self.create(name:, grade:)
-    song = Student.new(name, grade)
-    song.save
-    song
+    student = Student.new(name, grade)
+    student.save
+    student
   end
  
  def new_from_db
@@ -52,5 +62,16 @@ attr_reader :id
     sql = "UPDATE songs SET name = ?, album = ? WHERE id = ?"
     DB[:conn].execute(sql, self.name, self.album, self.id)
   end
+  
 
-end
+  def save
+    sql = <<-SQL
+      INSERT INTO students (name, grade)
+      VALUES (?, ?)
+    SQL
+
+    DB[:conn].execute(sql, self.name, self.grade)
+    @id = DB[:conn].execute("SELECT last_insert_rowid() FROM students")[0][0]
+  end
+
+ end	 
