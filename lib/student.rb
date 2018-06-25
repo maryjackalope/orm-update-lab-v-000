@@ -11,20 +11,6 @@ attr_reader :id
     @grade = grade
   end
  
-  def save
-    if self.id 
-      self.update
-    else
-      sql = <<-SQL
-        INSERT INTO songs (name, album) 
-        VALUES (?, ?)
-      SQL
- 
-      DB[:conn].execute(sql, self.name, self.album)
-      @id = DB[:conn].execute("SELECT last_insert_rowid() FROM songs")[0][0]
-    end
-  end
-  
   def self.create_table
     sql = <<-SQL
     CREATE TABLE IF NOT EXISTS students(
@@ -53,14 +39,14 @@ attr_reader :id
  end
  
   def self.find_by_name(id)
-    sql = "SELECT * FROM songs WHERE id = ?"
+    sql = "SELECT * FROM students WHERE id = ?"
     result = DB[:conn].execute(sql, id)[0]
-    Song.new(result[0], result[1], result[2])
+    Student.new(result[0], result[1], result[2])
   end
  
   def update
-    sql = "UPDATE songs SET name = ?, album = ? WHERE id = ?"
-    DB[:conn].execute(sql, self.name, self.album, self.id)
+    sql = "UPDATE students SET name = ?, grade = ? WHERE id = ?"
+    DB[:conn].execute(sql, self.name, self.grade, self.id)
   end
   
 
